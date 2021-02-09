@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackOnBuild>true</PackOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="nuget\RandomXSharp.targets" />
+    <None Include="nuget\RandomXSharp.targets" PackagePath="build\netstandard2.0\RandomXSharp.targets" Pack="true" />
+    <None Include="..\native\randomx.dll" Link="nuget\runtimes\win-x64\native\randomx.dll" PackagePath="runtimes\win-x64\native\randomx.dll" Pack="true" />
+  </ItemGroup>
+</Project>
