@@ -1,0 +1,35 @@
+name: Build
+
+on:
+- push
+- pull_request
+
+jobs:
+  build:
+    env:
+      RANDOMX_VERSION: v1.1.8
+    strategy:
+      matrix:
+        os: [macos-10.15, ubuntu-20.04, windows-2019]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+    - uses: actions/cache@v2
+      with:
+        path: native
+        key: ${{ runner.os }}-${{ env.RANDOMX_VERSION }}
+    - if: runner.os != 'Windows'
+      run: ./build-librandomx.sh "$RANDOMX_VERSION"
+    - if: runner.os == 'Windows'
+      run: ./Build-RandomX.ps1 -RandomXVersion "${env:RANDOMX_VERSION}"
+    - uses: actions/cache@v2
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: ${{ runner.os }}-nuget-
+    - run: dotnet restore
+    - run: dotnet build --no-restore
+    - run: dotnet test --no-build --verbosity normal
