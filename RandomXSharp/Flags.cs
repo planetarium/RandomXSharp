@@ -1,9 +1,7 @@
-﻿using System;
-
-namespace RandomXSharp
+﻿namespace RandomXSharp
 {
-    [Flags]
-    public enum RandomXFlags
+    [System.Flags]
+    public enum Flags
     {
         Default = 0,
         LargePages = 1,
