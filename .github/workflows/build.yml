@@ -10,6 +10,8 @@ jobs:
       RANDOMX_VERSION: v1.1.8
     strategy:
       matrix:
+        # CHECK: When you change the below list, you need to change
+        # the "download-artifact" steps in the "pack" job.
         os: [macos-10.15, ubuntu-20.04, windows-2019]
     runs-on: ${{ matrix.os }}
     steps:
@@ -33,3 +35,52 @@ jobs:
     - run: dotnet restore
     - run: dotnet build --no-restore
     - run: dotnet test --no-build --verbosity normal
+    - if: github.event_name == 'push'
+      uses: actions/upload-artifact@v2
+      with:
+        name: native-${{ runner.os }}
+        path: |
+          native/**/*.dll
+          native/**/*.dylib
+          native/**/*.so
+        if-no-files-found: error
+        retention-days: 7
+
+  dist:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+    # Download all native-* artifacts made by the "build" job.
+    - if: github.event_name == 'push'
+      uses: actions/download-artifact@v2
+      name: native-macos-10.15
+    - if: github.event_name == 'push'
+      uses: actions/download-artifact@v2
+      name: native-ubuntu-20.04
+    - if: github.event_name == 'push'
+      uses: actions/download-artifact@v2
+      name: native-windows-2019
+    - uses: actions/cache@v2
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: nuget-
+    - run: |
+        if [[ "$GITHUB_REF" = refs/tags/* ]]; then
+          dotnet pack -c Release -o dist
+        else
+          dotnet pack \
+            -c Release \
+            --version-suffix="dev.$GITHUB_RUN_NUMBER+${GITHUB_SHA:0:7}" \
+            -o dist
+        fi
+    - uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: dist/*.nupkg
+        if-no-files-found: error
