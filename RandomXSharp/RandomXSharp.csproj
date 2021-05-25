@@ -2,8 +2,9 @@
   <PropertyGroup>
     <PackageId>RandomXSharp</PackageId>
     <Title>RandomXSharp</Title>
-    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionPrefix>0.1.1</VersionPrefix>
     <Summary>RandomX binding for .NET</Summary>
+    <Description>RandomX binding for .NET</Description>
     <Authors>Planetarium</Authors>
     <Company>Planetarium</Company>
     <PackageProjectUrl>https://github.com/planetarium/RandomXSharp</PackageProjectUrl>
