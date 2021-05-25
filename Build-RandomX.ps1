@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param (
-  [string]$RandomXVersion = "v1.1.8"
+  [string]$RandomXVersion = "v1.1.9"
 )
 
 if (Test-Path native\randomx.dll) {

@@ -6,7 +6,7 @@ if ! command -v git > /dev/null; then
   exit 1
 fi
 
-randomx_version=v1.1.8
+randomx_version=v1.1.9
 if [[ "$1" != "" ]]; then
   randomx_version="$1"
 fi
