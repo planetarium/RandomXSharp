@@ -4,7 +4,7 @@ RandomXSharp changelog
 Version 0.1.1
 -------------
 
-To be released.
+Released on May 25, 2021.
 
  -  Fixed a bug where submitted NuGet packages had lacked native libraries
     for Linux/macOS/Windows.
