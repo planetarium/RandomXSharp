@@ -8,6 +8,7 @@
     <Company>Planetarium</Company>
     <PackageProjectUrl>https://github.com/planetarium/RandomXSharp</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>https://github.com/planetarium/RandomXSharp/blob/main/CHANGES.md</PackageReleaseNotes>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <RepositoryUrl>git://github.com/planetarium/RandomXSharp.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -30,6 +31,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\CHANGES.md" Pack="true" PackagePath="CHANGES.md" />
     <None Include="..\LICENSE" Pack="true" PackagePath="LICENSE.txt" />
     <None Include="..\README.md" Pack="true" PackagePath="README.md" />
     <None Include="..\native\*.dll">
