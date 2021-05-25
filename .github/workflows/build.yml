@@ -17,6 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - if: startsWith(github.ref, 'refs/tags/')
+      shell: pwsh
       run: |
         $proj = "./RandomXSharp/RandomXSharp.csproj"
         $xpath = '/Project/PropertyGroup/VersionPrefix/text()'
@@ -93,7 +94,7 @@ jobs:
         name: dist
         path: dist/*.nupkg
         if-no-files-found: error
-    - if: startsWith(github.ref, 'refs/tags/') && !github.event.repository.fork
+    - if: '!github.event.repository.fork'
       run: |
         dotnet nuget push \
           dist/*.nupkg \
