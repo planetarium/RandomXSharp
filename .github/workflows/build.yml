@@ -66,15 +66,18 @@ jobs:
       with:
         dotnet-version: '3.1.x'
     # Download all native-* artifacts made by the "build" job.
-    - if: github.event_name == 'push'
-      uses: actions/download-artifact@v2
-      name: native-macos-10.15
-    - if: github.event_name == 'push'
-      uses: actions/download-artifact@v2
-      name: native-ubuntu-20.04
-    - if: github.event_name == 'push'
-      uses: actions/download-artifact@v2
-      name: native-windows-2019
+    - uses: actions/download-artifact@v2
+      with:
+        name: native-Linux
+        path: native
+    - uses: actions/download-artifact@v2
+      with:
+        name: native-macOS
+        path: native
+    - uses: actions/download-artifact@v2
+      with:
+        name: native-Windows
+        path: native
     - uses: actions/cache@v2
       with:
         path: ~/.nuget/packages
