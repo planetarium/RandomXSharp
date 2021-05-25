@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     env:
-      RANDOMX_VERSION: v1.1.8
+      RANDOMX_VERSION: v1.1.9
     strategy:
       matrix:
         # CHECK: When you change the below list, you need to change
@@ -97,5 +97,5 @@ jobs:
       run: |
         dotnet nuget push \
           dist/*.nupkg \
-          --api-key "$NUGET_API_KEY" \
+          --api-key "${{ secrets.NUGET_API_KEY }}" \
           --source https://api.nuget.org/v3/index.json
