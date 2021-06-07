@@ -44,7 +44,15 @@ jobs:
         restore-keys: ${{ runner.os }}-nuget-
     - run: dotnet restore
     - run: dotnet build --no-restore
-    - run: dotnet test --no-build --verbosity diag
+    - if: startsWith(matrix.framework, 'netcoreapp')
+      run: |
+        dotnet test --no-restore --no-build -r /tmp/TestResults/ -v diag --blame
+    - if: always() && startsWith(matrix.framework, 'netcoreapp')
+      uses: actions/upload-artifact@v2
+      with:
+        name: crash-sequence.xml
+        path: /tmp/TestResults/
+        retention-days: 2
     - if: github.event_name == 'push'
       uses: actions/upload-artifact@v2
       with:
