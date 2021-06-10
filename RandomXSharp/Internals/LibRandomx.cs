@@ -12,7 +12,7 @@ namespace RandomXSharp.Internals
         public static extern IntPtr randomx_alloc_cache(Flags flags);
 
         [DllImport("randomx")]
-        public static extern void randomx_init_cache(IntPtr cache, byte[] key, uint keySize);
+        public static extern void randomx_init_cache(IntPtr cache, byte[] key, UIntPtr keySize);
 
         [DllImport("randomx")]
         public static extern void randomx_release_cache(IntPtr cache);
@@ -30,7 +30,7 @@ namespace RandomXSharp.Internals
         public static extern void randomx_calculate_hash(
             IntPtr machine,
             byte[] input,
-            uint inputSize,
+            UIntPtr inputSize,
             byte[] output
         );
 
@@ -38,14 +38,14 @@ namespace RandomXSharp.Internals
         public static extern void randomx_calculate_hash_first(
             IntPtr machine,
             byte[] input,
-            uint inputSize
+            UIntPtr inputSize
         );
 
         [DllImport("randomx")]
         public static extern void randomx_calculate_hash_next(
             IntPtr machine,
             byte[] nextInput,
-            uint nextInputSize,
+            UIntPtr nextInputSize,
             byte[] output
         );
 

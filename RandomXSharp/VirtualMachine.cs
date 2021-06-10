@@ -92,7 +92,7 @@ namespace RandomXSharp
             LibRandomx.randomx_calculate_hash(
                 _handle,
                 input,
-                Convert.ToUInt32(input.Length),
+                (UIntPtr)input.Length,
                 buffer
             );
             return buffer;
@@ -103,7 +103,7 @@ namespace RandomXSharp
             byte[]? buffer = null;
             foreach (byte[] input in inputs)
             {
-                uint inputSize = Convert.ToUInt32(input.Length);
+                var inputSize = (UIntPtr)input.Length;
                 if (buffer is { } output)
                 {
                     LibRandomx.randomx_calculate_hash_next(_handle, input, inputSize, output);

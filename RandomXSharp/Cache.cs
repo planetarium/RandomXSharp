@@ -10,7 +10,7 @@ namespace RandomXSharp
         public Cache(Flags flags, byte[] key)
         {
             _handle = LibRandomx.randomx_alloc_cache(flags);
-            LibRandomx.randomx_init_cache(_handle, key, Convert.ToUInt32(key.Length));
+            LibRandomx.randomx_init_cache(_handle, key, (UIntPtr)key.Length);
         }
 
         public void Dispose()
