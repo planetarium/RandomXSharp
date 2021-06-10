@@ -6,6 +6,11 @@ Version 0.2.0
 
 To be released.
 
+ -  Replaced [AdvancedDLSupport] with .NET [P/Invoke] for C
+    <abbr title="foreign function interface">FFI</abbr>.
+
+[AdvancedDLSupport]: https://github.com/Firwood-Software/AdvancedDLSupport
+[P/Invoke]: https://docs.microsoft.com/dotnet/standard/native-interop/pinvoke
 
 Version 0.1.1
 -------------
