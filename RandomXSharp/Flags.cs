@@ -1,7 +1,7 @@
-﻿namespace RandomXSharp
+namespace RandomXSharp
 {
     [System.Flags]
-    public enum Flags
+    public enum Flags : byte
     {
         Default = 0,
         LargePages = 1,
