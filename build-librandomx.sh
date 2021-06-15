@@ -24,6 +24,9 @@ if [[ -f "$destination" && "$CI" != "true" ]]; then
   echo "$destination already exists; this script will do nothing." > /dev/stderr
   exit 0
 fi
+if [[ ! -d "$(dirname "$0")/native" ]]; then
+  mkdir -p "$(dirname "$0")/native"
+fi
 
 tmpdir="$(mktemp -d)"
 cleanup_tmpdir() {
