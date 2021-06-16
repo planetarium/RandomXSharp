@@ -1,18 +1,23 @@
 name: Build
 
 on:
-- push
-- pull_request
+  push:
+  pull_request:
+  schedule:
+  - cron: '0 15 * * *'  # Every night KST (UTC +9)
 
 jobs:
   build:
     env:
       RANDOMX_VERSION: v1.1.9
+      XUNIT_VERSION: "2.4.1"
     strategy:
       matrix:
         # CHECK: When you change the below list, you need to change
         # the "download-artifact" steps in the "pack" job.
         os: [macos-10.15, ubuntu-20.04, windows-2019]
+        framework: [netcoreapp3.1, net472]
+      fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
@@ -29,23 +34,64 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '3.1.x'
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
     - uses: actions/cache@v2
       with:
         path: native
         key: ${{ runner.os }}-${{ env.RANDOMX_VERSION }}
+    - if: runner.os == 'Linux'
+      run: sudo apt-get install -y build-essential gcc gdb lldb
     - if: runner.os != 'Windows'
       run: ./build-librandomx.sh "$RANDOMX_VERSION"
     - if: runner.os == 'Windows'
       run: ./Build-RandomX.ps1 -RandomXVersion "${env:RANDOMX_VERSION}"
+    - if: startsWith(matrix.framework, 'net4')
+      run: nuget install xunit.runner.console -version ${{ env.XUNIT_VERSION }}
     - uses: actions/cache@v2
       with:
         path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-        restore-keys: ${{ runner.os }}-nuget-
+        key: ${{ runner.os }}-${{ matrix.framework }}-nuget
+        restore-keys: ${{ runner.os }}-${{ matrix.framework }}-nuget
     - run: dotnet restore
     - run: dotnet build --no-restore
-    - run: dotnet test --no-build --verbosity normal
-    - if: github.event_name == 'push'
+    - if: startsWith(matrix.framework, 'netcoreapp')
+      run: dotnet test --no-restore --no-build -r /tmp/TestResults/ -v n --blame -f ${{ matrix.framework }}
+    - if: always() && startsWith(matrix.framework, 'netcoreapp')
+      uses: actions/upload-artifact@v2
+      with:
+        name: crash-sequence.xml
+        path: /tmp/TestResults/
+        retention-days: 2
+    - if: startsWith(matrix.framework, 'net4') && runner.os != 'Windows'
+      run: |
+        tf="${{ matrix.framework }}"
+        v="$XUNIT_VERSION"
+        cp -v native/* RandomXSharp.Tests/bin/Debug/$tf/
+        cp -v native/* ./
+        export LD_LIBRARY_PATH="$(pwd)/RandomXSharp.Tests/bin/Debug/$tf/"
+        export DYLD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+        mono \
+          $HOME/.nuget/packages/xunit.runner.console/$v/tools/$tf/xunit.console.exe \
+          RandomXSharp.Tests/bin/Debug/$tf/RandomXSharp.Tests.dll \
+          -verbose \
+          -junit /tmp/junit.xml
+    - if: startsWith(matrix.framework, 'net4') && runner.os == 'Windows'
+      run: |
+        $tf = "${{ matrix.framework }}"
+        $v = "$env:XUNIT_VERSION"
+        copy-item native\* RandomXSharp.Tests\bin\Debug\$tf\
+        copy-item native\* .\
+        & "$env:USERPROFILE\.nuget\packages\xunit.runner.console\$v\tools\$tf\xunit.console.exe" `
+          RandomXSharp.Tests\bin\Debug\$tf\RandomXSharp.Tests.dll `
+          -verbose `
+          -junit /tmp/junit.xml
+    - if: always() && startsWith(matrix.framework, 'net4') && runner.os == 'Windows'
+      uses: mikepenz/action-junit-report@v2
+      with:
+        report_paths: /tmp/junit.xml
+    - if: github.event_name == 'push' && startsWith(matrix.framework, 'netcoreapp')
       uses: actions/upload-artifact@v2
       with:
         name: native-${{ runner.os }}

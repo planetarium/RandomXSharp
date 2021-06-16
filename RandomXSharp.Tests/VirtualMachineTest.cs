@@ -15,6 +15,29 @@ namespace RandomXSharp.Tests
         }
 
         [Fact]
+        public void SimpleCase()
+        {
+            Flags flags = Flags.Default;
+            byte[] hash;
+            using (var cache = new Cache(flags, Encoding.ASCII.GetBytes("cache key")))
+            using (var vm = new VirtualMachine(flags, cache, null))
+            {
+                hash = vm.CaculateHash(Encoding.ASCII.GetBytes("RandomX example input"));
+            }
+
+            _output.WriteLine("{0}", Hex(hash));
+
+            byte[] expected =
+            {
+                0x3d, 0x7a, 0x7a, 0x44, 0xf6, 0xf3, 0x1a, 0x41,
+                0x27, 0x79, 0x4c, 0xcf, 0x35, 0xea, 0x05, 0x36,
+                0xd0, 0xae, 0xa0, 0xbc, 0x08, 0xe7, 0x41, 0x69,
+                0x00, 0xb5, 0x4f, 0x0c, 0x8c, 0xf2, 0x87, 0xbf,
+            };
+            Assert.Equal(expected, hash);
+        }
+
+        [Fact]
         public void ApiExample1()
         {
             // Port of:

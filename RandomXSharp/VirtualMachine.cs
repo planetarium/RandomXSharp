@@ -42,7 +42,7 @@ namespace RandomXSharp
                 );
             }
 
-            _handle = LibRandomx.Instance.randomx_create_vm(
+            _handle = LibRandomx.randomx_create_vm(
                 flags,
                 cache?._handle ?? IntPtr.Zero,
                 dataset?._handle ?? IntPtr.Zero
@@ -81,7 +81,7 @@ namespace RandomXSharp
                     );
                 }
 
-                LibRandomx.Instance.randomx_vm_set_cache(_handle, value._handle);
+                LibRandomx.randomx_vm_set_cache(_handle, value._handle);
                 _cache = value;
             }
         }
@@ -89,10 +89,10 @@ namespace RandomXSharp
         public byte[] CaculateHash(byte[] input)
         {
             var buffer = new byte[HashSize];
-            LibRandomx.Instance.randomx_calculate_hash(
+            LibRandomx.randomx_calculate_hash(
                 _handle,
                 input,
-                Convert.ToUInt32(input.Length),
+                (UIntPtr)input.Length,
                 buffer
             );
             return buffer;
@@ -100,19 +100,18 @@ namespace RandomXSharp
 
         public IEnumerable<byte[]> CalculateHashes(IEnumerable<byte[]> inputs)
         {
-            ILibRandomx librandomx = LibRandomx.Instance;
             byte[]? buffer = null;
             foreach (byte[] input in inputs)
             {
-                uint inputSize = Convert.ToUInt32(input.Length);
+                var inputSize = (UIntPtr)input.Length;
                 if (buffer is { } output)
                 {
-                    librandomx.randomx_calculate_hash_next(_handle, input, inputSize, output);
+                    LibRandomx.randomx_calculate_hash_next(_handle, input, inputSize, output);
                     yield return output;
                 }
                 else
                 {
-                    librandomx.randomx_calculate_hash_first(_handle, input, inputSize);
+                    LibRandomx.randomx_calculate_hash_first(_handle, input, inputSize);
                 }
 
                 buffer = new byte[HashSize];
@@ -120,14 +119,14 @@ namespace RandomXSharp
 
             if (buffer is { } lastOutput)
             {
-                librandomx.randomx_calculate_hash_last(_handle, lastOutput);
+                LibRandomx.randomx_calculate_hash_last(_handle, lastOutput);
                 yield return lastOutput;
             }
         }
 
         public void Dispose()
         {
-            LibRandomx.Instance.randomx_destroy_vm(_handle);
+            LibRandomx.randomx_destroy_vm(_handle);
         }
     }
 }

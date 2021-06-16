@@ -21,25 +21,23 @@ namespace RandomXSharp.Tests.Internals
         {
             // Port of:
             //   https://github.com/tevador/RandomX/blob/v1.1.8/src/tests/api-example1.c
-            ILibRandomx librandomx = LibRandomx.Instance;
-
             byte[] myKey = Encoding.ASCII.GetBytes("RandomX example key\0");
             byte[] myInput = Encoding.ASCII.GetBytes("RandomX example input\0");
             var hash = new byte[32];
 
-            Flags flags = librandomx.randomx_get_flags();
-            IntPtr myCache = librandomx.randomx_alloc_cache(flags);
-            librandomx.randomx_init_cache(myCache, myKey, Convert.ToUInt32(myKey.Length));
-            IntPtr myMachine = librandomx.randomx_create_vm(flags, myCache, IntPtr.Zero);
-            librandomx.randomx_calculate_hash(
+            Flags flags = LibRandomx.randomx_get_flags();
+            IntPtr myCache = LibRandomx.randomx_alloc_cache(flags);
+            LibRandomx.randomx_init_cache(myCache, myKey, (UIntPtr)myKey.Length);
+            IntPtr myMachine = LibRandomx.randomx_create_vm(flags, myCache, IntPtr.Zero);
+            LibRandomx.randomx_calculate_hash(
                 myMachine,
                 myInput,
-                Convert.ToUInt32(myInput.Length),
+                (UIntPtr)myInput.Length,
                 hash
             );
 
-            librandomx.randomx_destroy_vm(myMachine);
-            librandomx.randomx_release_cache(myCache);
+            LibRandomx.randomx_destroy_vm(myMachine);
+            LibRandomx.randomx_release_cache(myCache);
 
             _output.WriteLine(string.Join("", hash.Select(b => $"{b:x02}")));
 
