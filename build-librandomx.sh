@@ -17,13 +17,13 @@ fi
 
 case "$(uname -s)" in
 Darwin)
-  shared_lib_filename=librandomx.dylib
-  ;;
+lib_filename=librandomx.dylib
+;;
 *)
-  shared_lib_filename=librandomx.so
-  ;;
+lib_filename=librandomx.so
+;;
 esac
-destination="$(dirname "$0")/native/$shared_lib_filename"
+destination="$(dirname "$0")/native/$lib_filename"
 if [[ -f "$destination" && "$CI" != "true" ]]; then
   echo "$destination already exists; this script will do nothing." > /dev/stderr
   exit 0
@@ -51,8 +51,27 @@ elif [[ "$(uname -s)" = Darwin ]] && command -v clang > /dev/null; then
   export CC=clang
   export CXX=clang++
 fi
-cmake -DARCH=native -DBUILD_SHARED_LIBS=ON
-make
+if [[ "$BUILD_STATIC_LIBS" != "" ]]; then
+  cmake \
+    -DARCH=native \
+    -DCMAKE_C_FLAGS="-static -no-pie -static-libgcc" \
+    -DCMAKE_CXX_FLAGS="-static -no-pie -static-libgcc -static-libstdc++ -fno-rtti"
+  make
+  gcc \
+    -o librandomx.so \
+    -shared \
+    -fno-rtti \
+    -Wl,--whole-archive \
+    "$(gcc --print-file-name=libc.a)" \
+    librandomx.a \
+    -static-libgcc \
+    -static-libstdc++ \
+    -lstdc++ \
+    -Wl,--no-whole-archive
+else
+  cmake -DARCH=native -DBUILD_SHARED_LIBS=ON
+  make
+fi
 popd
-cp "$tmpdir/$shared_lib_filename" "$destination"
+cp "$tmpdir/$lib_filename" "$destination"
 echo "$destination has been made; check it out!" > /dev/stderr

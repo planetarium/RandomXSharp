@@ -1,0 +1,5 @@
+.DS_Store
+.git/
+Dockerfile
+native/
+RandomXSharp{,.Tests}/{bin,obj}/
