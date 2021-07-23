@@ -6,10 +6,12 @@ on:
   schedule:
   - cron: '0 15 * * *'  # Every night KST (UTC +9)
 
+env:
+  RANDOMX_VERSION: v1.1.9
+
 jobs:
   build:
     env:
-      RANDOMX_VERSION: v1.1.9
       XUNIT_VERSION: "2.4.1"
     strategy:
       matrix:
@@ -42,8 +44,12 @@ jobs:
         path: native
         key: ${{ runner.os }}-${{ env.RANDOMX_VERSION }}
     - if: runner.os == 'Linux'
-      run: sudo apt-get install -y build-essential gcc gdb lldb
-    - if: runner.os != 'Windows'
+      run: |
+        docker build --build-arg BUILD_NATIVE_ONLY=true -t librandomx .
+        docker cp \
+          "$(docker create librandomx):/usr/local/src/RandomXSharp/native/librandomx.so" \
+          native/
+    - if: runner.os == 'macOS'
       run: ./build-librandomx.sh "$RANDOMX_VERSION"
     - if: runner.os == 'Windows'
       run: ./Build-RandomX.ps1 -RandomXVersion "${env:RANDOMX_VERSION}"
