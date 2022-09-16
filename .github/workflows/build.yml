@@ -18,7 +18,7 @@ jobs:
         # CHECK: When you change the below list, you need to change
         # the "download-artifact" steps in the "pack" job.
         os: [macos-10.15, ubuntu-20.04, windows-2019]
-        framework: [netcoreapp3.1, net472]
+        framework: [net6.0, net472]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
